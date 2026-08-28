@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#7c3aed">
+<title>Croma Tools</title>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+:root{
+--bg:#0a0118;--soft:#1a0b2e;--card:#1e1235;--hi:#2a1849;
+--border:#3d2466;--text:#f3e8ff;--muted:#a78bce;
+--accent:#a855f7;--pink:#ec4899;--green:#10b981;
+--red:#ef4444;--amber:#f59e0b;--cyan:#06b6d4;--blue:#3b82f6
+}
+html,body{
+min-height:100%;
+font-family:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
+background:var(--bg);
+color:var(--text);
+font-size:15px
+}
+body{
+background-image:
+radial-gradient(circle at 20% 0%,rgba(168,85,247,.25),transparent 50%),
+radial-gradient(circle at 80% 100%,rgba(236,72,153,.2),transparent 50%);
+background-attachment:fixed
+}
+.shell{max-width:700px;margin:auto;padding:18px}
+.head{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
+.logo{
+width:48px;height:48px;border-radius:14px;
+background:linear-gradient(135deg,var(--accent),var(--pink));
+display:grid;place-items:center;font-size:26px
+}
+.head h1{font-size:22px}
+.tag,.sub,.hint,.count,.status{color:var(--muted);font-size:12px}
+.back{
+display:none;background:var(--card);border:1px solid var(--border);
+color:var(--text);padding:8px 14px;border-radius:10px;font-weight:700
+}
+.back.show{display:inline-block}
+.welcome,.card{
+background:var(--card);border:1px solid var(--border);
+border-radius:16px;padding:16px;margin-bottom:12px
+}
+.welcome{text-align:center}
+.welcome .big{font-size:18px;font-weight:700}
+.welcome .small{font-size:12px;color:var(--muted);margin-top:4px}
+.tile{
+display:block;width:100%;padding:20px 18px;margin:12px 0;
+border:0;border-radius:18px;color:#fff;text-align:left;
+font-size:17px;font-weight:700;cursor:pointer
+}
+.tile .emoji{display:block;font-size:34px;margin-bottom:8px}
+.tile .desc{display:block;margin-top:6px;font-size:12px;font-weight:500;line-height:1.4}
+.tile-1{background:linear-gradient(135deg,#10b981,#059669)}
+.tile-2{background:linear-gradient(135deg,#a855f7,#ec4899)}
+.section{display:none}
+.section.active{display:block}
+h2{font-size:18px;margin-bottom:6px}
+.sub{line-height:1.4;margin-bottom:12px}
+textarea{
+width:100%;min-height:150px;padding:12px;
+border:1px solid var(--border);border-radius:12px;
+background:var(--soft);color:var(--text);
+font:15px ui-monospace,monospace;resize:vertical
+}
+textarea:focus{
+outline:0;border-color:var(--accent);
+box-shadow:0 0 0 3px #a855f733
+}
+.hint{margin-top:6px;line-height:1.4;opacity:.85}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{
+flex:1;min-width:120px;padding:13px 10px;border:0;
+border-radius:11px;color:#fff;font-size:14px;
+font-weight:700;cursor:pointer
+}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:linear-gradient(135deg,var(--accent),var(--pink))}
+.green{background:var(--green)}
+.amber{background:var(--amber);color:#1c1917}
+.cyan{background:var(--cyan);color:#062a30}
+.blue{background:var(--blue)}
+.red{background:var(--red)}
+.wa{background:#25d366}
+.bar{
+height:8px;margin-top:12px;border:1px solid var(--border);
+border-radius:4px;background:var(--soft);overflow:hidden
+}
+.bar>div{
+width:0;height:100%;
+background:linear-gradient(90deg,var(--accent),var(--pink));
+transition:.2s
+}
+.stat{display:flex;gap:7px;margin-top:12px}
+.stat>div{
+flex:1;padding:9px 4px;border:1px solid var(--border);
+border-radius:10px;background:var(--soft);
+text-align:center;font-size:11px
+}
+.stat b{display:block;margin-top:2px;color:#fff;font-size:17px}
+.total{
+display:none;margin-top:14px;padding:14px;border-radius:14px;
+background:linear-gradient(135deg,#10b981,#059669);
+text-align:center
+}
+.total small{display:block;font-size:11px;font-weight:700}
+.total strong{display:block;margin-top:4px;font-size:28px}
+table{
+width:100%;margin-top:12px;border-collapse:collapse;font-size:12px
+}
+th,td{
+padding:8px 6px;border-bottom:1px solid var(--border);
+text-align:left;word-break:break-word
+}
+th{
+background:var(--soft);color:var(--accent);
+font-size:11px;text-transform:uppercase
+}
+tr:hover td{background:var(--hi)}
+.bad{color:#fca5a5}
+.zero{color:#f87171;font-weight:700}
+.ok{color:#4ade80;font-weight:700}
+.foot{
+text-align:center;padding:24px 0 12px;
+color:var(--muted);font-size:11px
+}
+.toast{
+position:fixed;bottom:24px;left:50%;z-index:5;
+transform:translateX(-50%);padding:12px 20px;
+border-radius:10px;background:var(--green);color:#fff;
+font-weight:700;opacity:0;pointer-events:none;transition:.25s
+}
+.toast.show{opacity:1}
+@media(max-width:520px){
+.stat{gap:3px}
+.stat>div{font-size:10px;padding:8px 2px}
+table{font-size:11px}
+th,td{padding:7px 4px}
+}
+</style>
+</head>
+
+<body>
+<div class="shell">
+
+<div class="head">
+<button class="back" id="backBtn" onclick="showHome()">←</button>
+<div class="logo">🎁</div>
+<div>
+<h1>Croma Tools</h1>
+<div class="tag">Gift card formatter and balance report</div>
+</div>
+</div>
+
+<div id="home">
+<div class="welcome">
+<div class="big">👋 Welcome To Kartik Tools</div>
+<div class="small">Choose a tool to get started</div>
+</div>
+
+<button class="tile tile-1" onclick="show('formatter')">
+<span class="emoji">✨</span>
+Format Setter
+<span class="desc">
+Paste messy SMS or emails and copy clean card numbers and PINs for Sheets.
+</span>
+</button>
+
+<button class="tile tile-2" onclick="show('checker')">
+<span class="emoji">💰</span>
+Balance Checker
+<span class="desc">
+Check authorized card numbers and export the report.
+</span>
+</button>
+
+<div class="foot">v4.0 · 🎁 Croma Tools</div>
+</div>
+
+<section class="section" id="formatter">
+<div class="card">
+<h2>✨ Format Setter</h2>
+<div class="sub">
+Paste anything, then copy card and PIN columns for Google Sheets.
+</div>
+
+<textarea id="fInput" placeholder="Paste card and PIN text here..."></textarea>
+
+<div class="hint">
+The formatter reads digit runs and pairs 16-digit cards with 6-digit PINs.
+</div>
+
+<div class="row">
+<button class="btn primary" onclick="fExtractAndCopy()">
+⚡ Extract &amp; Copy
+</button>
+</div>
+
+<div class="row">
+<button class="btn amber" onclick="fCopyCards()">🎴 All Cards</button>
+<button class="btn cyan" onclick="fCopyPins()">🔑 All PINs</button>
+</div>
+
+<div class="row">
+<button class="btn blue" onclick="fExtractOnly()">👁 Preview</button>
+<button class="btn red" onclick="fClear()">🗑 Clear</button>
+</div>
+</div>
+
+<div class="count" id="fCount"></div>
+
+<table id="fOut" hidden>
+<thead>
+<tr><th>#</th><th>Card</th><th>PIN</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</section>
+
+<section class="section" id="checker">
+<div class="card">
+<h2>💰 Balance Checker</h2>
+
+<div class="sub">
+Paste 16-digit card numbers. Duplicate values are skipped automatically.
+</div>
+
+<textarea id="cards" placeholder="Paste card numbers here..."></textarea>
+
+<div class="row">
+<button class="btn primary" id="checkBtn" onclick="cRun()">
+🔍 Check Balance
+</button>
+</div>
+
+<div class="bar">
+<div id="prog"></div>
+</div>
+
+<div class="status" id="cStatus"></div>
+
+<div class="total" id="totalBox">
+<small>💰 TOTAL WORTH</small>
+<strong id="totalAmt">₹0</strong>
+</div>
+
+<div class="stat" id="stats" hidden>
+<div>Total<b id="t">0</b></div>
+<div>₹0<b id="z">0</b></div>
+<div>Balance<b id="nz">0</b></div>
+<div>Invalid<b id="iv">0</b></div>
+<div>Duplicate<b id="dup">0</b></div>
+</div>
+
+<div class="row" id="cActions" hidden>
+<button class="btn green" onclick="cDownload()">⬇ CSV</button>
+<button class="btn wa" onclick="cShareWA()">📱 WhatsApp</button>
+<button class="btn red" onclick="cClear()">🗑 Clear</button>
+</div>
+</div>
+
+<table id="cTbl" hidden>
+<thead>
+<tr>
+<th>#</th>
+<th>Card</th>
+<th>Balance</th>
+<th>Status</th>
+<th>Expiry</th>
+</tr>
+</thead>
+<tbody id="cTb"></tbody>
+</table>
+</section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CHECK_API = "/api/check";
+const MAX_CONCURRENT = 8;
+const MAX_RETRIES = 3;
+const REQUEST_TIMEOUT = 15000;
+
+const retryable = new Set([
+408,425,429,500,502,503,504
+]);
+
+const state = {
+fResults: [],
+results: [],
+dups: new Set(),
+running: false
+};
+
+const $ = id => document.getElementById(id);
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+function show(id){
+$("home").style.display = "none";
+
+document.querySelectorAll(".section")
+.forEach(section => section.classList.remove("active"));
+
+$(id).classList.add("active");
+$("backBtn").classList.add("show");
+
+history.pushState({view:id}, "", "#" + id);
+scrollTo(0, 0);
+}
+
+function showHome(){
+$("home").style.display = "block";
+
+document.querySelectorAll(".section")
+.forEach(section => section.classList.remove("active"));
+
+$("backBtn").classList.remove("show");
+history.replaceState({view:"home"}, "", "#home");
+scrollTo(0, 0);
+}
+
+addEventListener("popstate", () => {
+const hash = location.hash.slice(1);
+
+if(hash === "checker" || hash === "formatter"){
+show(hash);
+}else{
+showHome();
+}
+});
+
+if(location.hash.slice(1) === "checker" ||
+location.hash.slice(1) === "formatter"){
+show(location.hash.slice(1));
+}
+
+function toast(message, color = "var(--green)"){
+const t = $("toast");
+t.textContent = message;
+t.style.background = color;
+t.classList.add("show");
+
+clearTimeout(window.toastTimer);
+
+window.toastTimer = setTimeout(() => {
+t.classList.remove("show");
+}, 2500);
+}
+
+function copyText(text, message){
+const fallback = () => {
+const area = document.createElement("textarea");
+area.value = text;
+area.style.position = "fixed";
+area.style.opacity = "0";
+document.body.append(area);
+area.select();
+
+try{
+document.execCommand("copy");
+toast(message);
+}catch(error){
+toast("Copy failed", "var(--red)");
+}
+
+area.remove();
+};
+
+if(navigator.clipboard && window.isSecureContext){
+navigator.clipboard.writeText(text)
+.then(() => toast(message))
+.catch(fallback);
+}else{
+fallback();
+}
+}
+
+/* Formatter */
+
+function fRuns(raw){
+return (raw.match(/\d+/g) || [])
+.map(pure => ({pure, len:pure.length}));
+}
+
+function fExtract(){
+const raw = $("fInput").value;
+
+if(!raw.trim()){
+toast("Paste something first", "var(--red)");
+return false;
+}
+
+const parts = [];
+
+fRuns(raw).forEach(item => {
+if(item.len === 22){
+parts.push({
+pure:item.pure.slice(0,16),
+len:16
+});
+
+parts.push({
+pure:item.pure.slice(16),
+len:6
+});
+}else{
+parts.push(item);
+}
+});
+
+state.fResults = [];
+let card = null;
+
+parts.forEach(item => {
+if(item.len === 16){
+if(card){
+state.fResults.push({card, pin:""});
+}
+
+card = item.pure;
+}else if(item.len === 6){
+if(card){
+state.fResults.push({
+card,
+pin:item.pure
+});
+
+card = null;
+}else{
+state.fResults.push({
+card:"",
+pin:item.pure
+});
+}
+}
+});
+
+if(card){
+state.fResults.push({
+card,
+pin:""
+});
+}
+
+fRender();
+return state.fResults.length > 0;
+}
+
+function fRender(){
+const tbody = document.querySelector("#fOut tbody");
+tbody.replaceChildren();
+
+state.fResults.forEach((item, index) => {
+const row = document.createElement("tr");
+
+[
+index + 1,
+item.card || "missing",
+item.pin || "missing"
+].forEach(value => {
+const cell = document.createElement("td");
+cell.textContent = value;
+
+if(value === "missing"){
+cell.className = "bad";
+}
+
+row.append(cell);
+});
+
+tbody.append(row);
+});
+
+$("fOut").hidden = !state.fResults.length;
+
+$("fCount").textContent = state.fResults.length
+? `${state.fResults.length} row(s) ready`
+: "";
+}
+
+function fExtractOnly(){
+if(fExtract()){
+toast(`Found ${state.fResults.length} card(s)`);
+}
+}
+
+function fExtractAndCopy(){
+if(fExtract()){
+copyText(
+state.fResults
+.map(item => `${item.card}\t${item.pin}`)
+.join("\n"),
+`Copied ${state.fResults.length} row(s)`
+);
+}
+}
+
+function fCopyCards(){
+if(!state.fResults.length && !fExtract()) return;
+
+copyText(
+state.fResults
+.filter(item => item.card)
+.map(item => item.card)
+.join("\n"),
+"Cards copied"
+);
+}
+
+function fCopyPins(){
+if(!state.fResults.length && !fExtract()) return;
+
+copyText(
+state.fResults
+.filter(item => item.pin)
+.map(item => item.pin)
+.join("\n"),
+"PINs copied"
+);
+}
+
+function fClear(){
+$("fInput").value = "";
+state.fResults = [];
+fRender();
+toast("Cleared", "var(--blue)");
+}
+
+/* Checker */
+
+function asNumber(value){
+if(value === null || value === undefined || value === ""){
+return null;
+}
+
+const number = Number(
+String(value).replace(/[₹,\s]/g, "")
+);
+
+return Number.isFinite(number) ? number : null;
+}
+
+function apiResult(card, payload){
+const body =
+payload &&
+payload.data &&
+typeof payload.data === "object" &&
+!Array.isArray(payload.data)
+? payload.data
+: payload;
+
+if(!body || typeof body !== "object"){
+return {
+card,
+error:"API ne balance details nahi bheji",
+_retry:false
+};
+}
+
+const keys = [
+"balance",
+"amount",
+"remainingBalance",
+"status",
+"state",
+"expiry",
+"expiryDate",
+"error",
+"message"
+];
+
+const hasKnownField = keys.some(key =>
+Object.prototype.hasOwnProperty.call(body, key)
+);
+
+if(!hasKnownField){
+return {
+card,
+error:"API ne balance, status ya expiry field nahi bheji",
+_retry:false
+};
+}
+
+return {
+...body,
+card,
+balance:body.balance ?? body.amount ?? body.remainingBalance,
+status:body.status ?? body.state,
+expiry:body.expiry ?? body.expiryDate,
+_retry:false
+};
+}
+
+async function cCheck(card){
+for(let attempt = 0; attempt <= MAX_RETRIES; attempt++){
+const controller = new AbortController();
+
+const timer = setTimeout(
+() => controller.abort(),
+REQUEST_TIMEOUT
+);
+
+try{
+const response = await fetch(CHECK_API, {
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({card}),
+signal:controller.signal
+});
+
+const text = await response.text();
+
+let data = {};
+
+try{
+data = text ? JSON.parse(text) : {};
+}catch(error){
+data = {
+message:text.slice(0,120)
+};
+}
+
+if(response.ok){
+return apiResult(card, data);
+}
+
+const message =
+data.error && data.message
+? `${data.error}: ${data.message}`
+: data.error || data.message || `HTTP ${response.status}`;
+
+if(
+!retryable.has(response.status) ||
+attempt === MAX_RETRIES
+){
+return {
+card,
+error:message,
+_retry:false
+};
+}
+
+}catch(error){
+if(attempt === MAX_RETRIES){
+return {
+card,
+error:error.name === "AbortError"
+? "Request timed out"
+: "Network error",
+_retry:false
+};
+}
+}finally{
+clearTimeout(timer);
+}
+
+await wait(700 * (attempt + 1));
+}
+
+return {
+card,
+error:"Request failed",
+_retry:false
+};
+}
+
+function resolved(result){
+return Boolean(result) && result._retry !== true;
+}
+
+function addCell(row, value, className = ""){
+const cell = document.createElement("td");
+cell.textContent = value ?? "";
+
+if(className){
+cell.className = className;
+}
+
+row.append(cell);
+}
+
+function invalidResult(result){
+const text = String(
+result.error || result.status || ""
+).toLowerCase();
+
+return result.invalid === true ||
+/invalid|not found/.test(text);
+}
+
+function balanceText(result){
+const number = asNumber(result.balance);
+
+return number === null
+? "N/A"
+: `₹${number.toLocaleString("en-IN")}`;
+}
+
+function render(){
+const tbody = $("cTb");
+tbody.replaceChildren();
+
+let zero = 0;
+let positive = 0;
+let invalid = 0;
+let total = 0;
+
+state.results.forEach((result, index) => {
+const row = document.createElement("tr");
+
+addCell(row, index + 1);
+addCell(row, result.card);
+
+if(!resolved(result)){
+addCell(row, "Retrying...", "bad");
+}else if(result.error){
+const isInvalid = invalidResult(result);
+
+if(isInvalid){
+invalid++;
+}
+
+addCell(
+row,
+isInvalid ? "Invalid Gift Card" : result.error,
+"bad"
+);
+}else{
+const number = asNumber(result.balance);
+
+if(number === 0){
+zero++;
+}
+
+if(number !== null && number > 0){
+positive++;
+total += number;
+}
+
+addCell(
+row,
+balanceText(result),
+number === null
+? "bad"
+: number > 0
+? "ok"
+: "zero"
+);
+}
+
+if(resolved(result) && !result.error){
+addCell(row, result.status ?? "");
+addCell(row, result.expiry ?? "");
+}else{
+addCell(row, "");
+addCell(row, "");
+}
+
+tbody.append(row);
+});
+
+$("t").textContent = state.results.length;
+$("z").textContent = zero;
+$("nz").textContent = positive;
+$("iv").textContent = invalid;
+$("dup").textContent = state.dups.size;
+$("totalAmt").textContent = `₹${total.toLocaleString("en-IN")}`;
+
+return {
+total,
+zero,
+positive,
+invalid
+};
+}
+
+async function cRun(){
+if(state.running){
+return;
+}
+
+const matches = $("cards").value.match(/\d{16}/g) || [];
+
+if(!matches.length){
+toast("No 16-digit numbers found", "var(--red)");
+return;
+}
+
+const counts = {};
+
+matches.forEach(card => {
+counts[card] = (counts[card] || 0) + 1;
+});
+
+state.dups = new Set(
+Object.keys(counts).filter(card => counts[card] > 1)
+);
+
+const cards = [...new Set(matches)];
+
+state.results = cards.map(card => ({
+card,
+_retry:true
+}));
+
+state.running = true;
+
+$("checkBtn").disabled = true;
+$("cTbl").hidden = false;
+$("stats").hidden = false;
+$("totalBox").style.display = "block";
+$("cActions").hidden = true;
+
+$("dup").textContent = state.dups.size;
+
+let next = 0;
+let done = 0;
+
+const worker = async () => {
+while(next < cards.length){
+const index = next++;
+const result = await cCheck(cards[index]);
+
+state.results[index] = result;
+done++;
+
+$("prog").style.width =
+`${done / cards.length * 100}%`;
+
+$("cStatus").textContent =
+`Checking: ${done}/${cards.length}`;
+
+if(done % 10 === 0 || done === cards.length){
+render();
+}
+}
+};
+
+await Promise.all(
+Array.from(
+{
+length:Math.min(MAX_CONCURRENT, cards.length)
+},
+worker
+)
+);
+
+const summary = render();
+
+state.running = false;
+
+$("checkBtn").disabled = false;
+$("cActions").hidden = false;
+$("prog").style.width = "100%";
+
+$("cStatus").textContent =
+`Finished: ${cards.length} unique card(s)`;
+
+toast(
+`Finished · ₹${summary.total.toLocaleString("en-IN")} total`
+);
+}
+
+function csvCell(value){
+return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function cDownload(){
+const rows = [
+[
+"Sr No",
+"Gift Card No",
+"Balance",
+"Status",
+"Expiry",
+"Error"
+]
+];
+
+state.results.forEach((result, index) => {
+rows.push([
+index + 1,
+result.card,
+result.error ? "" : result.balance ?? "",
+result.status ?? "",
+result.expiry ?? "",
+result.error ?? ""
+]);
+});
+
+const csv = rows
+.map(row => row.map(csvCell).join(","))
+.join("\n");
+
+const blob = new Blob(
+[csv],
+{
+type:"text/csv;charset=utf-8"
+}
+);
+
+const link = document.createElement("a");
+
+link.href = URL.createObjectURL(blob);
+link.download = "giftcard_balances.csv";
+link.click();
+
+URL.revokeObjectURL(link.href);
+toast("CSV downloaded");
+}
+
+function cShareWA(){
+let text =
+`*Croma Gift Card Balances* (${state.results.length} cards)\n\n`;
+
+state.results.forEach((result, index) => {
+text +=
+`${index + 1}. ${result.card} - ${
+result.error || balanceText(result)
+}${
+result.status ? ` (${result.status})` : ""
+}\n`;
+});
+
+if(text.length > 4000){
+text = text.slice(0,3900) +
+"\n...(truncated, use CSV)";
+}
+
+window.open(
+"https://wa.me/?text=" +
+encodeURIComponent(text),
+"_blank"
+);
+}
+
+function cClear(){
+if(state.running){
+toast(
+"Wait for current check to finish",
+"var(--amber)"
+);
+return;
+}
+
+state.results = [];
+state.dups.clear();
+
+$("cards").value = "";
+$("cTb").replaceChildren();
+$("cTbl").hidden = true;
+$("stats").hidden = true;
+$("totalBox").style.display = "none";
+$("cActions").hidden = true;
+$("prog").style.width = "0";
+$("cStatus").textContent = "";
+$("totalAmt").textContent = "₹0";
+
+toast("Cleared", "var(--blue)");
+}
+</script>
+</body>
+</html>
